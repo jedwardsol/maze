@@ -98,6 +98,7 @@ int solve( Grid &grid )  // Dijkstra
         }
 
         gridmap.at( current.pos ).visited = true;
+        grid.set(current.pos, Grid::Cell::considered);
 
         if( current.pos == exit ) {
             break;

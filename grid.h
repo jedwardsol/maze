@@ -25,7 +25,8 @@ public:
         up = 4,
         down = 8,
         visited = 16,
-        onPath = 32
+        onPath = 32,
+        considered = 64
     };
 
 
