@@ -1,17 +1,16 @@
-﻿#include <windows.h>
-#include <iostream>
+﻿#include "grid.h"
 #include <array>
-#include <format>
-#include <string_view>
-#include "grid.h"
 #include <chrono>
+#include <format>
+#include <iostream>
+#include <string_view>
+#include <windows.h>
 
-namespace ch=std::chrono;
-using Clock=ch::steady_clock;
+namespace ch = std::chrono;
+using Clock = ch::steady_clock;
 
-void mazify(Grid    &grid);
-void solve (Grid    &grid);
-
+void mazify( Grid &grid );
+int  solve( Grid &grid );
 
 template< typename... ARGS >
 void print( std::string_view format, ARGS &&...args )
@@ -20,8 +19,6 @@ void print( std::string_view format, ARGS &&...args )
 
     std::vformat_to( out, format, std::make_format_args( args... ) );
 }
-
-
 
 std::array< char8_t const *, 16 > glyphs = {
     u8" ",   //  0000
@@ -42,50 +39,42 @@ std::array< char8_t const *, 16 > glyphs = {
     u8"╬",   //  1111
 };
 
-
-void print(Grid const &grid)
+void print( Grid const &grid )
 {
-    auto bold   = "\033[1m"; 
-    auto red    = "\033[38;5;196m"; 
+    auto bold = "\033[1m";
+    auto red = "\033[38;5;196m";
     auto normal = "\033[0m";
- 
-    print("\n\n\n");
+
+    print( "\n\n\n" );
 
     for( int row = 0; row < grid.height(); row++ ) {
-
-        print("\n   ");
+        print( "\n   " );
 
         for( int col = 0; col < grid.width(); col++ ) {
+            auto onPath = grid.isSet( { row, col }, Grid::Cell::onPath );
+            auto index = static_cast< uint8_t >( grid.at( { row, col } ) ) & 0b1111;
+            auto glyph = reinterpret_cast< char const * >( glyphs[ index ] );
 
-            auto onPath = grid.isSet( { row, col }, Grid::Cell::onPath ) ;
-            auto index  = static_cast< uint8_t >( grid.at( { row, col } ) ) & 0b1111;
-            auto glyph  = reinterpret_cast< char const * >( glyphs[ index ] ); 
-
-            if(onPath)
-            {
-                print("{}{}{}",red,glyph,normal);
-            }
-            else
-            {
-                print("{}", glyph);
+            if( onPath ) {
+                print( "{}{}{}", red, glyph, normal );
+            } else {
+                print( "{}", glyph );
             }
         }
     }
 
-    print("\n\n\n");
+    print( "\n\n\n" );
 }
-
-
 
 int main()
 {
     auto conOut = GetStdHandle( STD_OUTPUT_HANDLE );
 
     SetConsoleOutputCP( CP_UTF8 );
-    DWORD mode{};
-    GetConsoleMode(conOut,&mode);
-    mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING ;
-    SetConsoleMode(conOut,mode);
+    DWORD mode {};
+    GetConsoleMode( conOut, &mode );
+    mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    SetConsoleMode( conOut, mode );
 
     CONSOLE_SCREEN_BUFFER_INFO screen {};
     GetConsoleScreenBufferInfo( conOut, &screen );
@@ -96,21 +85,23 @@ int main()
     Grid grid( H - 5, W - 6 );
 
     auto start = Clock::now();
-    mazify(grid);
+    mazify( grid );
 
     auto made = Clock::now();
 
-    solve(grid);
+    int pathLength=solve( grid );
 
     auto solved = Clock::now();
 
-    print(grid);
+    print( grid );
 
     auto printed = Clock::now();
 
-    print("{}x{} create={} solve={} print={}\n",
-    grid.height(), grid.width(),
-    ch::duration_cast<ch::milliseconds>(made-start), 
-    ch::duration_cast<ch::milliseconds>(solved-made), 
-    ch::duration_cast<ch::milliseconds>(printed-solved));
+    print( "{}x{} path={} steps.  create={} solve={} print={}\n",
+           grid.height(),
+           grid.width(),
+           pathLength,
+           ch::duration_cast< ch::milliseconds >( made - start ),
+           ch::duration_cast< ch::milliseconds >( solved - made ),
+           ch::duration_cast< ch::milliseconds >( printed - solved ) );
 }

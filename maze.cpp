@@ -1,12 +1,7 @@
-﻿#include <vector>
+﻿#include "grid.h"
 #include <random>
 #include <stack>
-
-#include "grid.h"
-
-
-
-
+#include <vector>
 
 enum class Direction {
     none,
@@ -16,28 +11,25 @@ enum class Direction {
     down,
 };
 
-
 Direction chooseDirection( auto const &grid, Pos const &pos )
 {
     static std::mt19937 rng { std::random_device {}() };
 
     std::vector< Direction > choices;
 
-    if( pos.col != 0 && !grid.isSet ( { pos.row, pos.col - 1 }, Grid::Cell::visited ) ) {
-        choices.push_back( Direction::left );
+    if( pos.col != 0 && !grid.isSet( { pos.row, pos.col - 1 }, Grid::Cell::visited ) ) {
         choices.push_back( Direction::left );
     }
 
-    if( pos.row != 0 && !grid.isSet( { pos.row - 1, pos.col },Grid::Cell::visited ) ) {
-        choices.push_back( Direction::up );
-        choices.push_back( Direction::up );
-    }
-
-    if( pos.col != grid.width() - 1 && !grid.isSet( { pos.row, pos.col + 1 },Grid::Cell::visited ) ) {
+    if( pos.col != grid.width() - 1 && !grid.isSet( { pos.row, pos.col + 1 }, Grid::Cell::visited ) ) {
         choices.push_back( Direction::right );
     }
 
-    if( pos.row != grid.height() - 1 && !grid.isSet( { pos.row + 1, pos.col } ,Grid::Cell::visited) ) {
+    if( pos.row != 0 && !grid.isSet( { pos.row - 1, pos.col }, Grid::Cell::visited ) ) {
+        choices.push_back( Direction::up );
+    }
+
+    if( pos.row != grid.height() - 1 && !grid.isSet( { pos.row + 1, pos.col }, Grid::Cell::visited ) ) {
         choices.push_back( Direction::down );
     }
 
@@ -48,7 +40,7 @@ Direction chooseDirection( auto const &grid, Pos const &pos )
     }
 }
 
-void mazify(Grid    &grid)
+void mazify( Grid &grid )
 {
     std::stack< Pos > path;
     Pos walk { 0, 0 };
@@ -95,8 +87,4 @@ void mazify(Grid    &grid)
         grid.set( walk, Grid::Cell::visited );
         path.push( walk );
     }
-
 }
-
-
-
