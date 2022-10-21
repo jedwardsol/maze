@@ -71,8 +71,10 @@ void print( Grid const &grid )
     print( "\n\n\n" );
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    std::vector<std::string>  args(argv+1,argv+argc);
+
     auto conOut = GetStdHandle( STD_OUTPUT_HANDLE );
 
     SetConsoleOutputCP( CP_UTF8 );
@@ -81,13 +83,22 @@ int main()
     mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     SetConsoleMode( conOut, mode );
 
-    CONSOLE_SCREEN_BUFFER_INFO screen {};
-    GetConsoleScreenBufferInfo( conOut, &screen );
+    size_t  H,W;
 
-    auto H = screen.srWindow.Bottom - screen.srWindow.Top;
-    auto W = screen.srWindow.Right - screen.srWindow.Left;
+    if(args.size()==2)
+    {
+        H = stoi(args[0]);
+        W = stoi(args[1]);
+    }
+    else
+    {
+        CONSOLE_SCREEN_BUFFER_INFO screen {};
+        GetConsoleScreenBufferInfo( conOut, &screen );
 
-    Grid grid( H - 5, W - 6 );
+        H = screen.srWindow.Bottom - screen.srWindow.Top - 5;
+        W = screen.srWindow.Right - screen.srWindow.Left - 6;
+    }
+    Grid grid( H , W );
 
     auto startMake = Clock::now();
     mazify( grid );
