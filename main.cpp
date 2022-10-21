@@ -41,8 +41,9 @@ std::array< char8_t const *, 16 > glyphs = {
 
 void print( Grid const &grid )
 {
-    auto bold = "\033[1m";
-    auto red = "\033[38;5;196m";
+    auto bold   = "\033[1m";
+    auto red    = "\033[38;5;196m";     // https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
+    auto blue   = "\033[38;5;159m";
     auto normal = "\033[0m";
 
     print( "\n\n\n" );
@@ -60,7 +61,7 @@ void print( Grid const &grid )
                 print( "{}{}{}", red, glyph, normal );
             }
             else if( considered ) {
-                print( "{}{}{}", bold, glyph, normal );
+                print( "{}{}{}", blue, glyph, normal );
             } else {
                 print( "{}", glyph );
             }
@@ -88,24 +89,33 @@ int main()
 
     Grid grid( H - 5, W - 6 );
 
-    auto start = Clock::now();
+    auto startMake = Clock::now();
     mazify( grid );
+    auto endMake= Clock::now();
 
-    auto made = Clock::now();
-
-    int pathLength=solve( grid );
-
-    auto solved = Clock::now();
-
+    auto startPrint1 = Clock::now();
     print( grid );
+    auto endPrint1 = Clock::now();
 
-    auto printed = Clock::now();
+    print("Press enter to solve\n");
+    std::string  dummy;
+    std::getline(std::cin,dummy);
 
-    print( "{}x{} path={} steps.  create={} solve={} print={}\n",
+
+    auto startSolve = Clock::now();
+    int pathLength=solve( grid );
+    auto endSolve = Clock::now();
+
+    auto startPrint2 = Clock::now();
+    print( grid );
+    auto endPrint2 = Clock::now();
+
+    print( "{}x{} path={} steps.  create={} solve={} print={}&{}\n",
            grid.height(),
            grid.width(),
            pathLength,
-           ch::duration_cast< ch::milliseconds >( made - start ),
-           ch::duration_cast< ch::milliseconds >( solved - made ),
-           ch::duration_cast< ch::milliseconds >( printed - solved ) );
+           ch::duration_cast< ch::milliseconds >( endMake  - startMake ),
+           ch::duration_cast< ch::milliseconds >( endSolve - startSolve ),
+           ch::duration_cast< ch::milliseconds >( endPrint1  - startPrint1 ),
+           ch::duration_cast< ch::milliseconds >( endPrint2  - startPrint2 ));
 }
