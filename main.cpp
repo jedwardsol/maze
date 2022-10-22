@@ -52,15 +52,15 @@ void print( Grid const &grid )
         print( "\n   " );
 
         for( int col = 0; col < grid.width(); col++ ) {
-            auto onPath = grid.isSet( { row, col }, Grid::Cell::onPath );
-            auto considered = grid.isSet( { row, col }, Grid::Cell::considered );
-            auto index = static_cast< uint8_t >( grid.at( { row, col } ) ) & 0b1111;
+            auto onPath = grid.at({row,col}).onPath;
+            auto explored = grid.at( { row, col }).explored;
+            auto index = grid.at( { row, col } ).u & 0b1111;
             auto glyph = reinterpret_cast< char const * >( glyphs[ index ] );
 
             if( onPath ) {
                 print( "{}{}{}", red, glyph, normal );
             }
-            else if( considered ) {
+            else if( explored ) {
                 print( "{}{}{}", blue, glyph, normal );
             } else {
                 print( "{}", glyph );

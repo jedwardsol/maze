@@ -17,19 +17,19 @@ Direction chooseDirection( auto const &grid, Pos const &pos )
 
     std::vector< Direction > choices;
 
-    if( pos.col != 0 && !grid.isSet( { pos.row, pos.col - 1 }, Grid::Cell::visited ) ) {
+    if( pos.col != 0 && !grid.at( { pos.row, pos.col - 1 }).visited ) {
         choices.push_back( Direction::left );
     }
 
-    if( pos.col != grid.width() - 1 && !grid.isSet( { pos.row, pos.col + 1 }, Grid::Cell::visited ) ) {
+    if( pos.col != grid.width() - 1 && !grid.at( { pos.row, pos.col + 1 }).visited ) {
         choices.push_back( Direction::right );
     }
 
-    if( pos.row != 0 && !grid.isSet( { pos.row - 1, pos.col }, Grid::Cell::visited ) ) {
+    if( pos.row != 0 && !grid.at( { pos.row - 1, pos.col }).visited ) {
         choices.push_back( Direction::up );
     }
 
-    if( pos.row != grid.height() - 1 && !grid.isSet( { pos.row + 1, pos.col }, Grid::Cell::visited ) ) {
+    if( pos.row != grid.height() - 1 && !grid.at( { pos.row + 1, pos.col }).visited ) {
         choices.push_back( Direction::down );
     }
 
@@ -45,7 +45,7 @@ void mazify( Grid &grid )
     std::stack< Pos > path;
     Pos walk { 0, 0 };
 
-    grid.set( walk, Grid::Cell::visited );
+    grid.at(walk).visited=true;
     path.push( walk );
 
     while( !path.empty() ) {
@@ -60,31 +60,31 @@ void mazify( Grid &grid )
 
             case Direction::right:
                 next.col++;
-                grid.set( walk, Grid::Cell::right );
-                grid.set( next, Grid::Cell::left );
+                grid.at( walk).right =true;
+                grid.at( next).left =true;
                 break;
 
             case Direction::left:
                 next.col--;
-                grid.set( walk, Grid::Cell::left );
-                grid.set( next, Grid::Cell::right );
+                grid.at( walk).left =true;
+                grid.at( next).right=true;
                 break;
 
             case Direction::down:
                 next.row++;
-                grid.set( walk, Grid::Cell::down );
-                grid.set( next, Grid::Cell::up );
+                grid.at( walk).down=true;
+                grid.at( next).up  =true;
                 break;
 
             case Direction::up:
                 next.row--;
-                grid.set( walk, Grid::Cell::up );
-                grid.set( next, Grid::Cell::down );
+                grid.at( walk).up  =true;
+                grid.at( next).down=true;
                 break;
         }
 
         walk = next;
-        grid.set( walk, Grid::Cell::visited );
+        grid.at( walk).visited =true;
         path.push( walk );
     }
 }

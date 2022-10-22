@@ -61,19 +61,19 @@ std::vector< Pos > getNeighbours( Grid const &grid, Pos pos )
 {
     std::vector< Pos > neighbours;
 
-    if( grid.isSet( pos, Grid::Cell::left ) ) {
+    if( grid.at( pos).left )  {
         neighbours.emplace_back( pos.row, pos.col - 1 );
     }
 
-    if( grid.isSet( pos, Grid::Cell::right ) ) {
+    if( grid.at( pos).right )  {
         neighbours.emplace_back( pos.row, pos.col + 1 );
     }
 
-    if( grid.isSet( pos, Grid::Cell::up ) ) {
+    if( grid.at( pos).up )  {
         neighbours.emplace_back( pos.row - 1, pos.col );
     }
 
-    if( grid.isSet( pos, Grid::Cell::down ) ) {
+    if( grid.at( pos).down )  {
         neighbours.emplace_back( pos.row + 1, pos.col );
     }
 
@@ -98,7 +98,7 @@ int solve( Grid &grid )  // Dijkstra
         }
 
         gridmap.at( current.pos ).visited = true;
-        grid.set(current.pos, Grid::Cell::considered);
+        grid.at(current.pos).explored=true;
 
         if( current.pos == exit ) {
             break;
@@ -121,12 +121,12 @@ int solve( Grid &grid )  // Dijkstra
     auto walk { exit };
 
     while( walk != Pos { 0, 0 } ) {
-        grid.set( walk, Grid::Cell::onPath );
+        grid.at( walk).onPath =true;
 
         walk = gridmap.at( walk ).previous;
         walkLength++;
     }
-    grid.set( walk, Grid::Cell::onPath );
+    grid.at( walk).onPath =true;
     walkLength++;
 
 
