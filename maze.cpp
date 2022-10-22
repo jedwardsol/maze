@@ -101,7 +101,7 @@ void removeSomeDeadEnds(Grid &grid,int deadendPercent)
     {
         for(size_t col=1;col<grid.width();col++)
         {
-            if(   grid.junctions({row,col}) == 0b0010   // only right set
+            if(   grid.junctions({row,col}) == Grid::onlyRight 
                && percent(rng) < deadendPercent)
             {
                 grid.at({row,col  }).left =true;
@@ -115,7 +115,7 @@ void removeSomeDeadEnds(Grid &grid,int deadendPercent)
     {
         for(size_t col=0;col<grid.width()-1;col++)
         {
-            if(   grid.junctions({row,col}) == 0b0001   // only left set
+            if(   grid.junctions({row,col}) == Grid::onlyLeft
                && percent(rng) < deadendPercent)
             {
                 grid.at({row,col  }).right=true;
@@ -129,7 +129,7 @@ void removeSomeDeadEnds(Grid &grid,int deadendPercent)
     {
         for(size_t col=0;col<grid.width();col++)
         {
-            if(   grid.junctions({row,col}) == 0b1000   // only down set
+            if(   grid.junctions({row,col}) == Grid::onlyDown
                && percent(rng) < deadendPercent)
             {
                 grid.at({row,  col}).up   =true;
@@ -143,7 +143,7 @@ void removeSomeDeadEnds(Grid &grid,int deadendPercent)
     {
         for(size_t col=0;col<grid.width();col++)
         {
-            if(   grid.junctions({row,col}) == 0b0100   // only up set
+            if(   grid.junctions({row,col}) == Grid::onlyUp
                && percent(rng) < deadendPercent)
             {
                 grid.at({row,  col}).down =true;

@@ -85,7 +85,7 @@ int solve( Grid &grid )  // Dijkstra
     std::priority_queue< Candidate > fringe;
 
     GridMap gridmap { grid.height(), grid.width() };
-    Pos const exit { static_cast< int >( grid.height() - 1 ), static_cast< int >( grid.width() - 1 ) };
+    Pos const exit { ( grid.height() - 1 ), ( grid.width() - 1 ) };
 
     fringe.push( Candidate { 0, { 0, 0 } } );
 

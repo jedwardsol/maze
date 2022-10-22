@@ -32,6 +32,10 @@ public:
         };
     };
 
+    constexpr static uint8_t  onlyLeft {0b0001};
+    constexpr static uint8_t  onlyRight{0b0010};
+    constexpr static uint8_t  onlyUp   {0b0100};
+    constexpr static uint8_t  onlyDown {0b1000};
 
     Grid( size_t H, size_t W )
             : H { H }
