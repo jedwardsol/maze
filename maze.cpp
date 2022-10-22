@@ -151,8 +151,5 @@ void removeSomeDeadEnds(Grid &grid,int deadendPercent)
             }
         }
     }
-
-
-
 }
 

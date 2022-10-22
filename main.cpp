@@ -41,7 +41,7 @@ std::array< char8_t const *, 16 > glyphs = {
     u8"╬",   //  1111
 };
 
-void print( Grid const &grid )
+void printx( Grid const &grid )
 {
     auto bold   = "\033[1m";
     auto red    = "\033[38;5;196m";     // https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
@@ -72,6 +72,46 @@ void print( Grid const &grid )
 
     print( "\n\n\n" );
 }
+
+
+void print( Grid const &grid )
+{
+    auto bold   = "\033[1m";
+    auto red    = "\033[38;5;196m";     // https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
+    auto blue   = "\033[38;5;159m";
+    auto normal = "\033[0m";
+
+    std::string buffer;
+
+    buffer+= "\n\n\n" ;
+
+    for( size_t row = 0; row < grid.height(); row++ ) {
+        buffer+=  "\n   " ;
+
+        for( size_t col = 0; col < grid.width(); col++ ) {
+            auto onPath = grid.at({row,col}).onPath;
+            auto explored = grid.at( { row, col }).explored;
+            auto index = grid.junctions( { row, col } );
+            auto glyph = reinterpret_cast< char const * >( glyphs[ index ] );
+
+            if( onPath ) {
+                buffer+= std::format( "{}{}{}", red, glyph, normal );
+            }
+            else if( explored ) {
+                buffer+= std::format( "{}{}{}", blue, glyph, normal );
+            } else {
+                buffer+= std::format( "{}", glyph );
+            }
+        }
+    }
+
+    buffer+= "\n\n\n";
+
+    std::cout << buffer;
+
+}
+
+
 
 int main(int argc, char *argv[])
 {
