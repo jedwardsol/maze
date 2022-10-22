@@ -41,38 +41,6 @@ std::array< char8_t const *, 16 > glyphs = {
     u8"╬",   //  1111
 };
 
-void printx( Grid const &grid )
-{
-    auto bold   = "\033[1m";
-    auto red    = "\033[38;5;196m";     // https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
-    auto blue   = "\033[38;5;159m";
-    auto normal = "\033[0m";
-
-    print( "\n\n\n" );
-
-    for( size_t row = 0; row < grid.height(); row++ ) {
-        print( "\n   " );
-
-        for( size_t col = 0; col < grid.width(); col++ ) {
-            auto onPath = grid.at({row,col}).onPath;
-            auto explored = grid.at( { row, col }).explored;
-            auto index = grid.junctions( { row, col } );
-            auto glyph = reinterpret_cast< char const * >( glyphs[ index ] );
-
-            if( onPath ) {
-                print( "{}{}{}", red, glyph, normal );
-            }
-            else if( explored ) {
-                print( "{}{}{}", blue, glyph, normal );
-            } else {
-                print( "{}", glyph );
-            }
-        }
-    }
-
-    print( "\n\n\n" );
-}
-
 
 void print( Grid const &grid )
 {
