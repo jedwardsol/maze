@@ -10,6 +10,8 @@ namespace ch = std::chrono;
 using Clock = ch::steady_clock;
 
 void mazify( Grid &grid );
+void removeSomeDeadEnds(Grid &grid,int deadendPercent);
+
 int  solve( Grid &grid );
 
 template< typename... ARGS >
@@ -48,13 +50,13 @@ void print( Grid const &grid )
 
     print( "\n\n\n" );
 
-    for( int row = 0; row < grid.height(); row++ ) {
+    for( size_t row = 0; row < grid.height(); row++ ) {
         print( "\n   " );
 
-        for( int col = 0; col < grid.width(); col++ ) {
+        for( size_t col = 0; col < grid.width(); col++ ) {
             auto onPath = grid.at({row,col}).onPath;
             auto explored = grid.at( { row, col }).explored;
-            auto index = grid.at( { row, col } ).u & 0b1111;
+            auto index = grid.junctions( { row, col } );
             auto glyph = reinterpret_cast< char const * >( glyphs[ index ] );
 
             if( onPath ) {
@@ -83,25 +85,45 @@ int main(int argc, char *argv[])
     mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     SetConsoleMode( conOut, mode );
 
-    size_t  H,W;
+    size_t  H{};
+    size_t  W{};
+    int     deadendPercent{};
 
-    if(args.size()==2)
+    if(args.size()>=2)
     {
         H = stoi(args[0]);
         W = stoi(args[1]);
     }
-    else
-    {
-        CONSOLE_SCREEN_BUFFER_INFO screen {};
-        GetConsoleScreenBufferInfo( conOut, &screen );
 
+    if(args.size()>=3)
+    {
+        deadendPercent=stoi(args[2]);
+    }
+
+    CONSOLE_SCREEN_BUFFER_INFO screen {};
+    GetConsoleScreenBufferInfo( conOut, &screen );
+
+    if(H==0)
+    {
         H = screen.srWindow.Bottom - screen.srWindow.Top - 5;
+    }
+
+    if(W==0)
+    {
         W = screen.srWindow.Right - screen.srWindow.Left - 6;
     }
+
     Grid grid( H , W );
 
     auto startMake = Clock::now();
     mazify( grid );
+
+    if(deadendPercent)
+    {
+        removeSomeDeadEnds(grid,deadendPercent);
+    }
+
+
     auto endMake= Clock::now();
 
     auto startPrint1 = Clock::now();
@@ -121,7 +143,7 @@ int main(int argc, char *argv[])
     print( grid );
     auto endPrint2 = Clock::now();
 
-    print( "{}x{} path={} steps.  create={} solve={} print={}&{}\n",
+    print( "{}x{} path={} steps.  create={} solve={} print={} & {}\n",
            grid.height(),
            grid.width(),
            pathLength,

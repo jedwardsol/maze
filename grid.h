@@ -6,8 +6,8 @@
 
 struct Pos
 {
-    int row;
-    int col;
+    size_t row;
+    size_t col;
 
     friend auto operator<=>(Pos const&,Pos const&)=default;
 
@@ -60,6 +60,12 @@ public:
     {
         return grid[ pos.row * W + pos.col ];
     }
+
+    uint8_t junctions( Pos const &pos ) const
+    {
+        return grid[ pos.row * W + pos.col ].u & 0b1111;
+    }
+
 
 private:
     size_t H;

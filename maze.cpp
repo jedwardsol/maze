@@ -3,6 +3,7 @@
 #include <stack>
 #include <vector>
 
+
 enum class Direction {
     none,
     left,
@@ -88,3 +89,70 @@ void mazify( Grid &grid )
         path.push( walk );
     }
 }
+
+
+void removeSomeDeadEnds(Grid &grid,int deadendPercent)
+{
+    std::mt19937                    rng { std::random_device {}() };
+    std::uniform_int_distribution   percent{0,99};
+
+    // left deadends
+    for(size_t row=0;row<grid.height();row++)
+    {
+        for(size_t col=1;col<grid.width();col++)
+        {
+            if(   grid.junctions({row,col}) == 0b0010   // only right set
+               && percent(rng) < deadendPercent)
+            {
+                grid.at({row,col  }).left =true;
+                grid.at({row,col-1}).right=true;
+            }
+        }
+    }
+
+    // right deadends
+    for(size_t row=0;row<grid.height();row++)
+    {
+        for(size_t col=0;col<grid.width()-1;col++)
+        {
+            if(   grid.junctions({row,col}) == 0b0001   // only left set
+               && percent(rng) < deadendPercent)
+            {
+                grid.at({row,col  }).right=true;
+                grid.at({row,col+1}).left =true;
+            }
+        }
+    }
+
+    // up deadends
+    for(size_t row=1;row<grid.height();row++)
+    {
+        for(size_t col=0;col<grid.width();col++)
+        {
+            if(   grid.junctions({row,col}) == 0b1000   // only down set
+               && percent(rng) < deadendPercent)
+            {
+                grid.at({row,  col}).up   =true;
+                grid.at({row-1,col}).down =true;
+            }
+        }
+    }
+
+    // down deadends
+    for(size_t row=0;row<grid.height()-1;row++)
+    {
+        for(size_t col=0;col<grid.width();col++)
+        {
+            if(   grid.junctions({row,col}) == 0b0100   // only up set
+               && percent(rng) < deadendPercent)
+            {
+                grid.at({row,  col}).down =true;
+                grid.at({row+1,col}).up   =true;
+            }
+        }
+    }
+
+
+
+}
+
