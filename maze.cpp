@@ -41,12 +41,22 @@ Direction chooseDirection( auto const &grid, Pos const &pos )
     }
 }
 
+
+Pos randomPos(size_t height, size_t width)
+{
+    std::mt19937 rng { std::random_device {}() };
+
+    std::uniform_int_distribution<size_t>       heights{0,height-1};
+    std::uniform_int_distribution<size_t>       widths {0,width-1};
+
+    return {heights(rng), widths(rng)};
+}
+
 void mazify( Grid &grid, Algorithm algorithm )
 {
     static std::mt19937 rng { std::random_device {}() };
-
     std::vector<Pos>    fringe;
-    Pos                 start{ 0, 0 };
+    Pos                 start{ randomPos(grid.height(), grid.width()) };
 
     grid.at(start).visited=true;
     fringe.push_back( start);
@@ -60,10 +70,8 @@ void mazify( Grid &grid, Algorithm algorithm )
             std::swap(fringe[index],fringe.back());
         }
 
-
         Pos cell{ fringe.back()};
         Pos neighbour{ cell};
-
 
         auto direction = chooseDirection( grid, cell );
 

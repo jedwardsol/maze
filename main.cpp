@@ -76,15 +76,65 @@ void print( Grid const &grid )
     buffer+= "\n\n\n";
 
     std::cout << buffer;
-
 }
 
 
+struct MazeParams
+{
+    size_t      height{};
+    size_t      width{};
+    int         deadendPercent{};
+    Algorithm   algorithm;
+};
+
+auto getMazeParams(int argc, char *argv[])
+{
+    std::vector<std::string>  args(argv+1,argv+argc);
+    
+    MazeParams params;
+
+
+    for(auto &arg : args)
+    {
+        if(arg.starts_with("-H="))
+        {
+            params.height=stoi(arg.substr(3));    
+        }
+
+        if(arg.starts_with("-W="))
+        {
+            params.width=stoi(arg.substr(3));    
+        }
+
+        if(arg.starts_with("-D="))
+        {
+            params.deadendPercent=stoi(arg.substr(3));    
+        }
+
+        if(arg.starts_with("-A="))
+        {
+            params.algorithm=static_cast<Algorithm>(stoi(arg.substr(3)));    
+        }
+    }
+
+    CONSOLE_SCREEN_BUFFER_INFO screen {};
+    GetConsoleScreenBufferInfo( GetStdHandle( STD_OUTPUT_HANDLE ), &screen );
+
+    if(params.height==0)
+    {
+        params.height = screen.srWindow.Bottom - screen.srWindow.Top - 5;
+    }
+
+    if(params.width==0)
+    {
+        params.width = screen.srWindow.Right - screen.srWindow.Left - 6;
+    }
+
+    return params;
+}
 
 int main(int argc, char *argv[])
 {
-    std::vector<std::string>  args(argv+1,argv+argc);
-
     auto conOut = GetStdHandle( STD_OUTPUT_HANDLE );
 
     SetConsoleOutputCP( CP_UTF8 );
@@ -93,56 +143,16 @@ int main(int argc, char *argv[])
     mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     SetConsoleMode( conOut, mode );
 
-    size_t      height{};
-    size_t      width{};
-    int         deadendPercent{};
-    Algorithm   algorithm;
+    auto maze=getMazeParams(argc,argv);
 
-
-    for(auto &arg : args)
-    {
-        if(arg.starts_with("-H="))
-        {
-            height=stoi(arg.substr(3));    
-        }
-
-        if(arg.starts_with("-W="))
-        {
-            width=stoi(arg.substr(3));    
-        }
-
-        if(arg.starts_with("-D="))
-        {
-            deadendPercent=stoi(arg.substr(3));    
-        }
-
-        if(arg.starts_with("-A="))
-        {
-            algorithm=static_cast<Algorithm>(stoi(arg.substr(3)));    
-        }
-    }
-
-    CONSOLE_SCREEN_BUFFER_INFO screen {};
-    GetConsoleScreenBufferInfo( conOut, &screen );
-
-    if(height==0)
-    {
-        height = screen.srWindow.Bottom - screen.srWindow.Top - 5;
-    }
-
-    if(width==0)
-    {
-        width = screen.srWindow.Right - screen.srWindow.Left - 6;
-    }
-
-    Grid grid( height , width );
+    Grid grid( maze.height , maze.width );
 
     auto startMake = Clock::now();
-    mazify(grid,algorithm );
+    mazify(grid,maze.algorithm );
 
-    if(deadendPercent)
+    if(maze.deadendPercent)
     {
-        removeSomeDeadEnds(grid,deadendPercent);
+        removeSomeDeadEnds(grid,maze.deadendPercent);
     }
 
 
