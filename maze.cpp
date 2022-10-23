@@ -2,7 +2,7 @@
 #include <random>
 #include <stack>
 #include <vector>
-
+#include <iostream>
 
 enum class Direction {
     none,
@@ -41,52 +41,64 @@ Direction chooseDirection( auto const &grid, Pos const &pos )
     }
 }
 
-void mazify( Grid &grid )
+void mazify( Grid &grid, Algorithm algorithm )
 {
-    std::stack< Pos > path;
-    Pos walk { 0, 0 };
+    static std::mt19937 rng { std::random_device {}() };
 
-    grid.at(walk).visited=true;
-    path.push( walk );
+    std::vector<Pos>    fringe;
+    Pos                 start{ 0, 0 };
 
-    while( !path.empty() ) {
-        Pos next { walk };
-        auto direction = chooseDirection( grid, walk );
+    grid.at(start).visited=true;
+    fringe.push_back( start);
+
+    while( !fringe.empty() ) {
+
+        if(algorithm==Algorithm::Prims)
+        {
+            std::uniform_int_distribution<size_t>   indices{0,fringe.size()-1};
+            auto index=indices(rng);
+            std::swap(fringe[index],fringe.back());
+        }
+
+
+        Pos cell{ fringe.back()};
+        Pos neighbour{ cell};
+
+
+        auto direction = chooseDirection( grid, cell );
 
         switch( direction ) {
             case Direction::none:
-                walk = path.top();
-                path.pop();
+                fringe.pop_back();
                 continue;
 
             case Direction::right:
-                next.col++;
-                grid.at( walk).right =true;
-                grid.at( next).left =true;
+                neighbour.col++;
+                grid.at( cell).right =true;
+                grid.at( neighbour).left =true;
                 break;
 
             case Direction::left:
-                next.col--;
-                grid.at( walk).left =true;
-                grid.at( next).right=true;
+                neighbour.col--;
+                grid.at( cell).left =true;
+                grid.at( neighbour).right=true;
                 break;
 
             case Direction::down:
-                next.row++;
-                grid.at( walk).down=true;
-                grid.at( next).up  =true;
+                neighbour.row++;
+                grid.at( cell).down=true;
+                grid.at( neighbour).up  =true;
                 break;
 
             case Direction::up:
-                next.row--;
-                grid.at( walk).up  =true;
-                grid.at( next).down=true;
+                neighbour.row--;
+                grid.at( cell).up  =true;
+                grid.at( neighbour).down=true;
                 break;
         }
 
-        walk = next;
-        grid.at( walk).visited =true;
-        path.push( walk );
+        grid.at( neighbour).visited =true;
+        fringe.push_back( neighbour );
     }
 }
 

@@ -10,9 +10,14 @@ struct Pos
     size_t col;
 
     friend auto operator<=>(Pos const&,Pos const&)=default;
-
 };
 
+
+enum Algorithm
+{
+    RecursiveBackTrack,
+    Prims
+};
 
 
 class Grid

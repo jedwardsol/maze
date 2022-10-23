@@ -9,7 +9,7 @@
 namespace ch = std::chrono;
 using Clock = ch::steady_clock;
 
-void mazify( Grid &grid );
+void mazify( Grid &grid, Algorithm algorithm );
 void removeSomeDeadEnds(Grid &grid,int deadendPercent);
 
 int  solve( Grid &grid );
@@ -93,38 +93,52 @@ int main(int argc, char *argv[])
     mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     SetConsoleMode( conOut, mode );
 
-    size_t  H{};
-    size_t  W{};
-    int     deadendPercent{};
+    size_t      height{};
+    size_t      width{};
+    int         deadendPercent{};
+    Algorithm   algorithm;
 
-    if(args.size()>=2)
-    {
-        H = stoi(args[0]);
-        W = stoi(args[1]);
-    }
 
-    if(args.size()>=3)
+    for(auto &arg : args)
     {
-        deadendPercent=stoi(args[2]);
+        if(arg.starts_with("-H="))
+        {
+            height=stoi(arg.substr(3));    
+        }
+
+        if(arg.starts_with("-W="))
+        {
+            width=stoi(arg.substr(3));    
+        }
+
+        if(arg.starts_with("-D="))
+        {
+            deadendPercent=stoi(arg.substr(3));    
+        }
+
+        if(arg.starts_with("-A="))
+        {
+            algorithm=static_cast<Algorithm>(stoi(arg.substr(3)));    
+        }
     }
 
     CONSOLE_SCREEN_BUFFER_INFO screen {};
     GetConsoleScreenBufferInfo( conOut, &screen );
 
-    if(H==0)
+    if(height==0)
     {
-        H = screen.srWindow.Bottom - screen.srWindow.Top - 5;
+        height = screen.srWindow.Bottom - screen.srWindow.Top - 5;
     }
 
-    if(W==0)
+    if(width==0)
     {
-        W = screen.srWindow.Right - screen.srWindow.Left - 6;
+        width = screen.srWindow.Right - screen.srWindow.Left - 6;
     }
 
-    Grid grid( H , W );
+    Grid grid( height , width );
 
     auto startMake = Clock::now();
-    mazify( grid );
+    mazify(grid,algorithm );
 
     if(deadendPercent)
     {
